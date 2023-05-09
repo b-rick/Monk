@@ -110,6 +110,12 @@ public:
 		glUniform3fv(location, 1, &vec3[0]);
 	}
 
+	inline void set_uniform_vec4(const char* attribName, const glm::vec4& vec4) const
+	{
+		int location = get_uniform_location(attribName);
+		glUniform4fv(location, 1, &vec4[0]);
+	}
+
 	inline void set_uniform_mat4(const char* attribName, const glm::mat4& mat4) const
 	{
 		int location = get_uniform_location(attribName);

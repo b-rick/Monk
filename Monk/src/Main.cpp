@@ -13,7 +13,7 @@
 #include "Chapter2EBO.h"
 #include "Chapter2Window.h"
 #include "Chapter3Mesh.h"
-#include "Chapter4Depth.h"
+#include "Chapter4.h"
 #include "other_camera.h"
 #include "Box.h"
 #include "Model.h"
@@ -75,6 +75,7 @@ int main(void)
     }
 
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_STENCIL_TEST);
     glEnable(GL_DEBUG_OUTPUT);
     glDebugMessageCallback(MessageCallback, 0);
 
@@ -84,7 +85,7 @@ int main(void)
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
 
-    auto user_window = std::make_unique<Chapter4Depth>();
+    auto user_window = std::make_unique<Chapter4>();
 
     glfwSetWindowUserPointer(window, user_window.get());
     auto size_callback = [](GLFWwindow* w, int width, int height)

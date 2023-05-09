@@ -110,6 +110,9 @@
     <ClInclude Include="src\Chapter4Depth.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\Chapter4.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="shader\color.vert" />
@@ -132,6 +135,8 @@
     <None Include="shader\depth\normal.vert" />
     <None Include="shader\depth\depth-viz.frag" />
     <None Include="shader\depth\depth-viz-linear.frag" />
+    <None Include="shader\depth\outline.frag" />
+    <None Include="shader\depth\outline.vert" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="img\container.jpg">

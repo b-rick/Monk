@@ -137,8 +137,6 @@ public:
 	{
 		m_screenWidth = width;
 		m_screenHeight = height;
-		std::cerr << m_screenWidth << std::endl;
-		std::cerr << m_screenHeight << std::endl;
 	}
 
 	inline const glm::mat4 view_matrix() const
@@ -168,7 +166,6 @@ public:
 
 	inline void set_far_plane(float a_far_plane)
 	{
-		std::cerr << m_far_plane << std::endl;
 		m_far_plane = a_far_plane;
 	}
 };

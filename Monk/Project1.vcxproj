@@ -156,6 +156,7 @@ XCOPY "$(SolutionDir)Monk\img" "$(TargetDir)img\" /S /Y</Command>
     <ClInclude Include="src\Chapter2EBO.h" />
     <ClInclude Include="src\Chapter2Window.h" />
     <ClInclude Include="src\Chapter3Mesh.h" />
+    <ClInclude Include="src\Chapter4.h" />
     <ClInclude Include="src\ElementBuffer.h" />
     <ClInclude Include="src\Chapter4Depth.h" />
     <ClInclude Include="src\Light.h" />
@@ -184,6 +185,7 @@ XCOPY "$(SolutionDir)Monk\img" "$(TargetDir)img\" /S /Y</Command>
     <None Include="shader\depth\normal.frag" />
     <None Include="shader\depth\normal.vert" />
     <None Include="shader\depth\depth-viz-linear.frag" />
+    <None Include="shader\depth\outline.frag" />
     <None Include="shader\model\model_loading.fs" />
     <None Include="shader\model\model_loading.vs" />
     <None Include="shader\depth\depth-viz.frag" />
@@ -191,6 +193,7 @@ XCOPY "$(SolutionDir)Monk\img" "$(TargetDir)img\" /S /Y</Command>
     <None Include="shader\multilight\colors.vert" />
     <None Include="shader\multilight\lightCube.frag" />
     <None Include="shader\multilight\lightCube.vert" />
+    <None Include="shader\depth\outline.vert" />
     <None Include="shader\simple-tex-shader\texture.frag" />
     <None Include="shader\simple-tex-shader\texture.vert" />
     <None Include="shader\tex-shader-with-camera\texture.frag" />
