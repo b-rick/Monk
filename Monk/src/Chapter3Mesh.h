@@ -20,7 +20,7 @@ public:
 	// run before the game loop 
 	void on_load() 
 	{
-		//stbi_set_flip_vertically_on_load(true);
+		stbi_set_flip_vertically_on_load(true);
 		//m_Model = std::make_unique<Model>("objects/backpack/backpack.obj", m_renderer.get());
 		m_Model = std::make_unique<Model>("objects/miffy/model.fbx", m_renderer.get());
 		m_Shader = std::make_unique<Shader>("shader/model/model_loading.vs", "shader/model/model_loading.fs");

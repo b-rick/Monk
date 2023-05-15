@@ -137,6 +137,10 @@
     <None Include="shader\depth\depth-viz-linear.frag" />
     <None Include="shader\depth\outline.frag" />
     <None Include="shader\depth\outline.vert" />
+    <None Include="shader\blend\normal.frag" />
+    <None Include="shader\blend\normal.vert" />
+    <None Include="shader\blend\window.frag" />
+    <None Include="shader\blend\window.vert" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="img\container.jpg">

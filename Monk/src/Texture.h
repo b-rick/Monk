@@ -13,21 +13,22 @@ private:
 	unsigned int m_ID;
 	std::string m_path;
 public:
-	Texture(const std::string& a_path, TextureType a_type)
+	Texture(const std::string& a_path, TextureType a_type, bool flip=false, GLenum tex_wrap=GL_REPEAT)
 		: m_path{ a_path },
 		m_texture_type{ a_type }
 	{
 		glGenTextures(1, &m_ID);
 		glBindTexture(GL_TEXTURE_2D, m_ID);
 
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, tex_wrap);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, tex_wrap);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 		auto width = int{};
 		auto height = int{};
 		auto num_channels = int{};
+		stbi_set_flip_vertically_on_load(flip);
 		unsigned char* data = stbi_load(a_path.c_str(), &width, &height, &num_channels, 0);
 		if (data)
 		{

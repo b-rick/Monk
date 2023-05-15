@@ -180,6 +180,10 @@ XCOPY "$(SolutionDir)Monk\img" "$(TargetDir)img\" /S /Y</Command>
     <ClInclude Include="src\VertexBufferLayout.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="shader\blend\normal.frag" />
+    <None Include="shader\blend\normal.vert" />
+    <None Include="shader\blend\window.frag" />
+    <None Include="shader\blend\window.vert" />
     <None Include="shader\color.frag" />
     <None Include="shader\color.vert" />
     <None Include="shader\depth\normal.frag" />
