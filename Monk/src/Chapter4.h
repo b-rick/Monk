@@ -89,6 +89,8 @@ private:
     bool m_menu_open;
     bool m_border_enabled;
     bool m_border_enabled_per_object;
+    bool m_draw_windows;
+    bool m_draw_grass;
 
 public:
 	Chapter4() : Window()
@@ -111,6 +113,9 @@ public:
         this->m_border_enabled = false;
         this->m_border_enabled_per_object = false;
         this->m_border_thickness = 1.1f;
+
+        this->m_draw_windows = false;
+        this->m_draw_grass = false;
 	}
 
     void on_load()
@@ -186,6 +191,13 @@ public:
             ImGui::SliderFloat("Near plane", &m_near_plane, 0.1f, 10.0f);
             ImGui::SliderFloat("Far plane", &m_far_plane, 20.0f, 500.0f);
             ImGui::Checkbox("border enabled", &m_border_enabled);
+            ImGui::Checkbox("draw windows", &m_draw_windows);
+            if (m_draw_windows)
+            {
+                ImGui::Combo("Source Blend factor", &m_current_source_blend_factor, blend_names, IM_ARRAYSIZE(blend_names));
+                ImGui::Combo("Dest Blend factor", &m_current_dest_blend_factor, blend_names, IM_ARRAYSIZE(blend_names));
+            }
+            ImGui::Checkbox("draw grass", &m_draw_grass);
             if (m_border_enabled)
             {
                 ImGui::Checkbox("border enabled per object", &m_border_enabled_per_object);
@@ -200,8 +212,6 @@ public:
             {
                 m_should_close = true;
             }
-            ImGui::Combo("Source Blend factor", &m_current_source_blend_factor, blend_names, IM_ARRAYSIZE(blend_names));
-            ImGui::Combo("Dest Blend factor", &m_current_dest_blend_factor, blend_names, IM_ARRAYSIZE(blend_names));
 			ImGui::End();
         }
         else
@@ -261,6 +271,8 @@ public:
         auto view = m_camera->view_matrix();
         auto project = m_camera->projection_matrix();
 
+        /* ====================================== DRAW FLOOR ===================================== */
+
         // draw the floor 
         glStencilMask(0x00); // just make sure we don't accidentally write to the stencil buffer while drawing the floor 
         m_shaders[m_current_shader]->use();
@@ -270,6 +282,8 @@ public:
         m_floor_texture->use(GL_TEXTURE0);
         m_floor_vao->bind();
         glDrawArrays(GL_TRIANGLES, 0, 6);
+
+        /* ===================================== DRAW BOXES ====================================== */
         
         // draw normally, but enable writing to the stencil buffer 
         // write to the stencil buffer while drawing the cubes
@@ -339,45 +353,61 @@ public:
 			glStencilFunc(GL_ALWAYS, 1, 0xFF); // always write to stencil buf 
 			glEnable(GL_DEPTH_TEST);
         }
+
+        /* ================================= DRAW THE GRASS ============================================*/
+        if (m_draw_grass)
+        {
+			m_box_vao->bind();
+			m_grass_texture->use(GL_TEXTURE0);
+			m_grass_shader->use();
+			for (uint32_t i = 0; i < grass_locations.size(); ++i)
+			{
+				auto grass_model = glm::translate(glm::mat4(1.0f), grass_locations[i]);
+				m_grass_shader->set_uniform_mat4("view", view);
+				m_grass_shader->set_uniform_mat4("projection", project);
+				m_grass_shader->set_uniform_mat4("model", grass_model);
+				glDrawArrays(GL_TRIANGLES, 0, 6);
+
+			}
+        }
         
-        m_box_vao->bind();
-        m_grass_texture->use(GL_TEXTURE0);
-        m_grass_shader->use();
-        for (uint32_t i = 0; i < grass_locations.size(); ++i)
-        {
-            auto grass_model = glm::translate(glm::mat4(1.0f), grass_locations[i]);
-            m_grass_shader->set_uniform_mat4("view", view);
-            m_grass_shader->set_uniform_mat4("projection", project);
-            m_grass_shader->set_uniform_mat4("model", grass_model);
-            glDrawArrays(GL_TRIANGLES, 0, 6);
+        /* ================================= DRAW THE WINDOWS ============================================*/
 
+        // we have to draw all our transparent objects at the end to get the blending to work correctly
+        // they also need to be sorted in order of z coordinate
+
+        if (m_draw_windows)
+        {
+			int src_blend_func = blend_funcs[m_current_source_blend_factor];
+			int dest_blend_func = blend_funcs[m_current_dest_blend_factor];
+			glBlendFunc(src_blend_func, dest_blend_func);
+			// can also set individual rgp and alpha channel using: glBlendFuncSeparate(R G B A) each differernt blend funcs
+			
+
+			m_quad_vao->bind();
+			m_window_texture->use(GL_TEXTURE0);
+			m_window_shader->use();
+
+			const glm::vec3& cam_position = m_camera->position();
+			std::sort(window_locations.begin(), window_locations.end(), [&cam_position](const glm::vec3& window_one, const glm::vec3& window_two) {
+				return glm::distance(cam_position, window_one) > glm::distance(cam_position, window_two);
+			});
+			for (uint32_t i = 0; i < window_locations.size(); ++i)
+			{
+				auto window_model = glm::translate(glm::mat4(1.0f), window_locations[i]);
+				m_window_shader->set_uniform_mat4("view", view);
+				m_window_shader->set_uniform_mat4("projection", project);
+				m_window_shader->set_uniform_mat4("model", window_model);
+				glDrawArrays(GL_TRIANGLES, 0, 6);
+			}
+        }
+        else
+        {
+            glBlendFunc(GL_ONE, GL_ZERO);
         }
 
-        int src_blend_func = blend_funcs[m_current_source_blend_factor];
-        int dest_blend_func = blend_funcs[m_current_dest_blend_factor];
-        glBlendFunc(src_blend_func, dest_blend_func);
-  //      // can also set individual rgp and alpha channel using: glBlendFuncSeparate(R G B A) each differernt blend funcs
-  //      
-  //      // we have to draw all our transparent objects at the end to get the blending to work correctly
-  //      // they also need to be sorted in order of z coordinate
-
-        m_quad_vao->bind();
-        m_window_texture->use(GL_TEXTURE0);
-        m_window_shader->use();
-
-        const glm::vec3& cam_position = m_camera->position();
-		std::sort(window_locations.begin(), window_locations.end(), [&cam_position](const glm::vec3& window_one, const glm::vec3& window_two) {
-			return glm::distance(cam_position, window_one) > glm::distance(cam_position, window_two);
-		});
-        for (uint32_t i = 0; i < window_locations.size(); ++i)
-        {
-            auto window_model = glm::translate(glm::mat4(1.0f), window_locations[i]);
-            m_window_shader->set_uniform_mat4("view", view);
-            m_window_shader->set_uniform_mat4("projection", project);
-            m_window_shader->set_uniform_mat4("model", window_model);
-            glDrawArrays(GL_TRIANGLES, 0, 6);
-        }
-
+        
+        /* ==========================================DRAW UI ================================================*/
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     }
 
