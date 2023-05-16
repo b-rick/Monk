@@ -25,6 +25,11 @@ GL_ONE_MINUS_SRC_ALPHA, GL_DST_ALPHA, GL_ONE_MINUS_DST_ALPHA, GL_CONSTANT_COLOR,
 const char* blend_names[] = { "ZERO", "ONE", "SRC_COLOR", "ONE_MINUS_SRC_COLOR", "DST_COLOR", "ONE_MINUS_DST_COLOR", "SRC_ALPHA",
 "ONE_MINUS_SRC_ALPHA", "DST_ALPHA", "ONE_MINUS_DST_ALPHA", "CONSTANT_COLOR", "ONE_MINUS_CONSTANT_COLOR", "CONSTANT_ALPHA", "ONE_MINUS_CONSTANT_ALPHA" };
 
+const int cull_face[] = { GL_FRONT, GL_BACK, GL_FRONT_AND_BACK };
+const char* cull_face_names[] = {"GL_FRONT", "GL_BACK", "GL_FRONT_AND_BACK"};
+
+const int cull_winding[] = { GL_CCW, GL_CW, };
+const char* cull_winding_names[] = { "GL_CCW", "GL_CW" };
 
 const std::vector<glm::vec3> grass_locations = std::vector
 {
@@ -53,10 +58,12 @@ private:
 	std::unique_ptr<VertexBuffer> m_box_buffer;
 	std::unique_ptr<VertexBuffer> m_floor_buffer;
     std::unique_ptr<VertexBuffer> m_quad_buffer;
+    std::unique_ptr<VertexBuffer> m_culled_face_buffer;
 
 	std::unique_ptr<VertexArray> m_box_vao;
 	std::unique_ptr<VertexArray> m_floor_vao;
     std::unique_ptr<VertexArray> m_quad_vao;
+    std::unique_ptr<VertexArray> m_culled_face_vao;
 	
     std::array<std::unique_ptr<Shader>, std::size(shader_selection)> m_shaders;
 	std::unique_ptr<Texture> m_box_texture;
@@ -80,6 +87,8 @@ private:
     int m_current_dppass;
     int m_current_source_blend_factor;
     int m_current_dest_blend_factor;
+    int m_current_cull_face;
+    int m_current_cull_winding;
 
     float m_movement_speed;
     float m_near_plane;
@@ -91,6 +100,7 @@ private:
     bool m_border_enabled_per_object;
     bool m_draw_windows;
     bool m_draw_grass;
+    bool m_draw_culled_boxes;
 
 public:
 	Chapter4() : Window()
@@ -104,6 +114,8 @@ public:
         this->m_current_dppass = 2;
         this->m_current_source_blend_factor = 6;
         this->m_current_dest_blend_factor = 7;
+        this->m_current_cull_face = 0;
+        this->m_current_cull_winding = 0;
 
         this->m_movement_speed = 2.0;
         this->m_near_plane = 0.1f;
@@ -116,6 +128,7 @@ public:
 
         this->m_draw_windows = false;
         this->m_draw_grass = false;
+        this->m_draw_culled_boxes = false;
 	}
 
     void on_load()
@@ -148,6 +161,17 @@ public:
 
         m_quad_vao = std::make_unique<VertexArray>();
         m_quad_vao->addBuffer(m_quad_buffer.get(), vbl);
+
+        // make the culled face vao
+        m_culled_face_buffer = std::make_unique<VertexBuffer>(BOX_WINDING, static_cast<uint32_t>(sizeof(BOX_WINDING)), GL_STATIC_DRAW);
+        vbl = VertexBufferLayout();
+        vbl.push<float>(3); // position
+        vbl.push<float>(3); // normals
+        vbl.push<float>(2); // texture
+
+        m_culled_face_vao = std::make_unique<VertexArray>();
+        m_culled_face_vao->addBuffer(m_culled_face_buffer.get(), vbl);
+
 
         m_box_texture = std::make_unique<Texture>("img/depth/marble.jpg", DIFFUSE);
         m_floor_texture = std::make_unique<Texture>("img/depth/metal.png", DIFFUSE);
@@ -191,6 +215,12 @@ public:
             ImGui::SliderFloat("Near plane", &m_near_plane, 0.1f, 10.0f);
             ImGui::SliderFloat("Far plane", &m_far_plane, 20.0f, 500.0f);
             ImGui::Checkbox("border enabled", &m_border_enabled);
+            ImGui::Checkbox("draw culled boxes", &m_draw_culled_boxes);
+            if (m_draw_culled_boxes)
+            {
+                ImGui::Combo("Cull face", &m_current_cull_face, cull_face_names, IM_ARRAYSIZE(cull_face_names));
+                ImGui::Combo("Cull winding", &m_current_cull_winding, cull_winding_names, IM_ARRAYSIZE(cull_winding_names));
+            }
             ImGui::Checkbox("draw windows", &m_draw_windows);
             if (m_draw_windows)
             {
@@ -342,7 +372,7 @@ public:
             m_border_shader->set_uniform_vec4("borderColor", make_vec4(m_border_color));
             for (uint32_t i = 0; i < 2; ++i)
             {
-                auto cube_model = glm::translate(glm::mat4(1.0f), glm::vec3(i * 5, 0.0f, 0.0f));
+                auto cube_model = glm::translate(glm::mat4(1.0f), glm::vec3(i * 5, 0.1f, 0.0f));
                 cube_model = glm::scale(cube_model, glm::vec3(m_border_thickness));
                 m_border_shader->set_uniform_mat4("model", cube_model);
                 glDrawArrays(GL_TRIANGLES, 0, 36);
@@ -352,6 +382,30 @@ public:
 			glStencilMask(0xFF); // re enable stencil test?
 			glStencilFunc(GL_ALWAYS, 1, 0xFF); // always write to stencil buf 
 			glEnable(GL_DEPTH_TEST);
+        }
+
+        /* ================================ DRAW BOXES WITH FACE CULLING ===============================*/
+
+        if (m_draw_culled_boxes)
+        {
+            glEnable(GL_CULL_FACE);
+            glCullFace(cull_face[m_current_cull_face]);
+            glFrontFace(cull_winding[m_current_cull_winding]);
+            m_culled_face_vao->bind();
+            m_shaders[m_current_shader]->use();
+			m_shaders[m_current_shader]->set_uniform_mat4("view", view);
+			m_shaders[m_current_shader]->set_uniform_mat4("projection", project);
+            m_box_texture->use(GL_TEXTURE0);
+            for (uint32_t i = 0; i < 2; ++i)
+            {
+                auto cube_model = glm::translate(glm::mat4(1.0f), glm::vec3(i * 3.0f, 0.1f, 2.0f));
+                m_shaders[m_current_shader]->set_uniform_mat4("model", cube_model);
+                glDrawArrays(GL_TRIANGLES, 0, 36);
+            }
+        }
+        else
+        {
+            glDisable(GL_CULL_FACE);
         }
 
         /* ================================= DRAW THE GRASS ============================================*/
