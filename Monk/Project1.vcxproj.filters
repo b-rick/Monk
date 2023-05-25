@@ -113,6 +113,21 @@
     <ClInclude Include="src\Chapter4.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\Chapter4-Framebuffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Framebuffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ColorAttachment.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\DepthStencilAttachment.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RenderBuffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="shader\color.vert" />
@@ -141,6 +156,10 @@
     <None Include="shader\blend\normal.vert" />
     <None Include="shader\blend\window.frag" />
     <None Include="shader\blend\window.vert" />
+    <None Include="shader\fb\normal.frag" />
+    <None Include="shader\fb\normal.vert" />
+    <None Include="shader\fb\frame.frag" />
+    <None Include="shader\fb\frame.vert" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="img\container.jpg">

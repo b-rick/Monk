@@ -156,9 +156,13 @@ XCOPY "$(SolutionDir)Monk\img" "$(TargetDir)img\" /S /Y</Command>
     <ClInclude Include="src\Chapter2EBO.h" />
     <ClInclude Include="src\Chapter2Window.h" />
     <ClInclude Include="src\Chapter3Mesh.h" />
+    <ClInclude Include="src\Chapter4-Framebuffer.h" />
     <ClInclude Include="src\Chapter4.h" />
+    <ClInclude Include="src\ColorAttachment.h" />
+    <ClInclude Include="src\DepthStencilAttachment.h" />
     <ClInclude Include="src\ElementBuffer.h" />
     <ClInclude Include="src\Chapter4Depth.h" />
+    <ClInclude Include="src\Framebuffer.h" />
     <ClInclude Include="src\Light.h" />
     <ClInclude Include="src\LightingWindow.h" />
     <ClInclude Include="src\Locations.h" />
@@ -166,6 +170,7 @@ XCOPY "$(SolutionDir)Monk\img" "$(TargetDir)img\" /S /Y</Command>
     <ClInclude Include="src\Model.h" />
     <ClCompile Include="src\sbti.cpp" />
     <ClCompile Include="src\VertexArray.cpp" />
+    <ClInclude Include="src\RenderBuffer.h" />
     <ClInclude Include="src\Renderer.h" />
     <ClInclude Include="src\Window.h" />
   </ItemGroup>
@@ -190,6 +195,10 @@ XCOPY "$(SolutionDir)Monk\img" "$(TargetDir)img\" /S /Y</Command>
     <None Include="shader\depth\normal.vert" />
     <None Include="shader\depth\depth-viz-linear.frag" />
     <None Include="shader\depth\outline.frag" />
+    <None Include="shader\fb\normal.frag" />
+    <None Include="shader\fb\normal.vert" />
+    <None Include="shader\fb\frame.frag" />
+    <None Include="shader\fb\frame.vert" />
     <None Include="shader\model\model_loading.fs" />
     <None Include="shader\model\model_loading.vs" />
     <None Include="shader\depth\depth-viz.frag" />

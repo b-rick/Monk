@@ -131,3 +131,16 @@ const float QUAD[] =
 		1.0f, -0.5f,  0.0f,  1.0f,  1.0f,
 		1.0f,  0.5f,  0.0f,  1.0f,  0.0f
 };
+
+// A single quad for the whole screen in normalized device coordinates 
+const float QUAD_NDC[] =
+{
+	// positions   // texCoords
+	-1.0f,  1.0f,  0.0f, 1.0f,
+	-1.0f, -1.0f,  0.0f, 0.0f,
+	 1.0f, -1.0f,  1.0f, 0.0f,
+
+	-1.0f,  1.0f,  0.0f, 1.0f,
+	 1.0f, -1.0f,  1.0f, 0.0f,
+	 1.0f,  1.0f,  1.0f, 1.0f
+};
