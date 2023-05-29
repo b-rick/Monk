@@ -150,6 +150,7 @@ XCOPY "$(SolutionDir)Monk\img" "$(TargetDir)img\" /S /Y</Command>
     <ClCompile Include="..\Deps\imgui\src\imgui_draw.cpp" />
     <ClCompile Include="..\Deps\imgui\src\imgui_impl_glfw.cpp" />
     <ClCompile Include="..\Deps\imgui\src\imgui_impl_opengl3.cpp" />
+    <ClCompile Include="..\Deps\imgui\src\imgui_stdlib.cpp" />
     <ClCompile Include="..\Deps\imgui\src\imgui_tables.cpp" />
     <ClCompile Include="..\Deps\imgui\src\imgui_widgets.cpp" />
     <ClCompile Include="src\Main.cpp" />
@@ -169,9 +170,11 @@ XCOPY "$(SolutionDir)Monk\img" "$(TargetDir)img\" /S /Y</Command>
     <ClInclude Include="src\Mesh.h" />
     <ClInclude Include="src\Model.h" />
     <ClCompile Include="src\sbti.cpp" />
+    <ClCompile Include="src\Widget.cpp" />
     <ClCompile Include="src\VertexArray.cpp" />
     <ClInclude Include="src\RenderBuffer.h" />
     <ClInclude Include="src\Renderer.h" />
+    <ClInclude Include="src\Widget.h" />
     <ClInclude Include="src\Window.h" />
   </ItemGroup>
   <ItemGroup>

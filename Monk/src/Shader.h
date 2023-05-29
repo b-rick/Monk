@@ -7,19 +7,21 @@
 #include <string>
 #include <glad/glad.h>
 
+typedef void (*ShaderErrorCallback) (char* info);
+
 class Shader
 {
 private:
 	unsigned int m_Handle;
 
-	std::string slurp(std::ifstream& aIn)
+	static std::string slurp(std::ifstream& aIn)
 	{
 		auto sstr = std::ostringstream{};
 		sstr << aIn.rdbuf();
 		return sstr.str();
 	}
 
-	unsigned int compileShader(const char* aShaderPath, GLenum aShaderType)
+	static unsigned int compileShader(const char* aShaderPath, GLenum aShaderType)
 	{
 		auto shaderStream = std::ifstream{ aShaderPath };
 		shaderStream.exceptions(std::ifstream::failbit | std::ifstream::badbit);
@@ -32,18 +34,23 @@ private:
 		{
 			std::cerr << "SHADER::FILE_NOT_READ\n" << e.what() << std::endl;
 		}
-		auto shaderSrcC = shaderSrc.c_str();
 
+		auto my_error_cb = [](char* infoLog) { std::cerr << "SHADER::COMPILATION_FAILED\n" << infoLog << std::endl; };
+		return compileShaderSource(shaderSrc.c_str(), aShaderType, my_error_cb);
+	}
+
+	static unsigned int compileShaderSource(const char* shader_src, GLenum aShaderType, ShaderErrorCallback error_callback)
+	{
 		auto const shader = glCreateShader(aShaderType);
 
-		glShaderSource(shader, 1, &shaderSrcC, nullptr);
+		glShaderSource(shader, 1, &shader_src, nullptr);
 		glCompileShader(shader);
 
-		handleCompileError(shader, GL_COMPILE_STATUS);
+		handleCompileError(shader, GL_COMPILE_STATUS, error_callback);
 		return shader;
 	}
 
-	void handleCompileError(unsigned int aId, GLenum aStatus)
+	static void handleCompileError(unsigned int aId, GLenum aStatus, ShaderErrorCallback error_callback)
 	{
 		auto success = int{};
 		glGetShaderiv(aId, aStatus, &success);
@@ -51,11 +58,11 @@ private:
 		{
 			char infoLog[512]{};
 			glGetShaderInfoLog(aId, 512, nullptr, infoLog);
-			std::cerr << "SHADER::COMPILATION_FAILED\n" << infoLog << std::endl;
+			error_callback(infoLog);
 		}
 	}
 
-	void handleLinkError(unsigned int aId, GLenum aStatus)
+	void handleLinkError(unsigned int aId, GLenum aStatus, ShaderErrorCallback error_callback)
 	{
 		auto success = int{};
 		glGetProgramiv(aId, aStatus, &success);
@@ -63,28 +70,40 @@ private:
 		{
 			char infoLog[512]{};
 			glGetProgramInfoLog(aId, 512, nullptr, infoLog);
-			std::cerr << "SHADER::LINK_FAILED\n" << infoLog << std::endl;
+			error_callback(infoLog);
+		
 		}
 	}
 
 public:
-	Shader(const char* vertexPath, const char* fragmentPath)
+	explicit Shader(int vertex_shader, int fragment_shader)
 	{
-		auto vertexShader = compileShader(vertexPath, GL_VERTEX_SHADER);
-		auto fragmentShader = compileShader(fragmentPath, GL_FRAGMENT_SHADER);
-
 		m_Handle = glCreateProgram();
-		glAttachShader(m_Handle, vertexShader);
-		glAttachShader(m_Handle, fragmentShader);
+		glAttachShader(m_Handle, vertex_shader);
+		glAttachShader(m_Handle, fragment_shader);
 		glLinkProgram(m_Handle);
 		
-		handleLinkError(m_Handle, GL_LINK_STATUS);
+		auto err_cb = [](char* info) { 	std::cerr << "SHADER::LINK_FAILED\n" << info << std::endl; };
+		handleLinkError(m_Handle, GL_LINK_STATUS, err_cb);
 
-		glDetachShader(m_Handle, vertexShader);
-		glDetachShader(m_Handle, fragmentShader);
+		glDetachShader(m_Handle, vertex_shader);
+		glDetachShader(m_Handle, fragment_shader);
 
-		glDeleteShader(vertexShader);
-		glDeleteShader(fragmentShader);
+		glDeleteShader(vertex_shader);
+		glDeleteShader(fragment_shader);
+	}
+
+	Shader(const char* vertexPath, const char* fragmentPath) 
+		: Shader(compileShader(vertexPath, GL_VERTEX_SHADER), 
+			compileShader(fragmentPath, GL_FRAGMENT_SHADER))
+	{
+	}
+
+	static Shader fromText(const char* vertex_src, const char* frag_src, ShaderErrorCallback err_callback)
+	{
+		auto vertex_shader = compileShaderSource(vertex_src, GL_VERTEX_SHADER, err_callback);
+		auto fragment_shader = compileShaderSource(frag_src, GL_FRAGMENT_SHADER, err_callback);
+		return Shader(vertex_shader, fragment_shader);
 	}
 
 	void use() const

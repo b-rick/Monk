@@ -15,6 +15,7 @@
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
 #include <glm/glm.hpp>
+#include "TextWidget.h"
 
 
 class Chapter4FB : public Window
@@ -40,6 +41,8 @@ private:
     std::unique_ptr<FrameBuffer> m_framebuffer;
     std::unique_ptr<ColorTextureAttachment> m_color_attachment;
     std::unique_ptr<RenderBuffer> m_depth_stencil_rb;
+    
+    TextWidget m_widget;
 public:
 	Chapter4FB() : Window(), m_menu_open{false}, m_movement_speed{2.0}
 	{
@@ -61,6 +64,7 @@ public:
             {
                 m_should_close = true;
             }
+            m_widget.render();
             ImGui::End();
 		}
         else
