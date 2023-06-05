@@ -9,9 +9,9 @@
 class Widget
 {
 public:
-	Widget();
+	Widget() {};
 
-	virtual ~Widget() = 0;
+	virtual ~Widget() {};
 
 	virtual void setup() = 0;
 

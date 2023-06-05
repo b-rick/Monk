@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -153,7 +153,9 @@ XCOPY "$(SolutionDir)Monk\img" "$(TargetDir)img\" /S /Y</Command>
     <ClCompile Include="..\Deps\imgui\src\imgui_stdlib.cpp" />
     <ClCompile Include="..\Deps\imgui\src\imgui_tables.cpp" />
     <ClCompile Include="..\Deps\imgui\src\imgui_widgets.cpp" />
+    <ClCompile Include="src\AutoShader.cpp" />
     <ClCompile Include="src\Main.cpp" />
+    <ClInclude Include="src\AutoShader.h" />
     <ClInclude Include="src\Chapter2EBO.h" />
     <ClInclude Include="src\Chapter2Window.h" />
     <ClInclude Include="src\Chapter3Mesh.h" />
@@ -170,10 +172,11 @@ XCOPY "$(SolutionDir)Monk\img" "$(TargetDir)img\" /S /Y</Command>
     <ClInclude Include="src\Mesh.h" />
     <ClInclude Include="src\Model.h" />
     <ClCompile Include="src\sbti.cpp" />
-    <ClCompile Include="src\Widget.cpp" />
+    <ClCompile Include="src\TextWidget.cpp" />
     <ClCompile Include="src\VertexArray.cpp" />
     <ClInclude Include="src\RenderBuffer.h" />
     <ClInclude Include="src\Renderer.h" />
+    <ClInclude Include="src\TextWidget.h" />
     <ClInclude Include="src\Widget.h" />
     <ClInclude Include="src\Window.h" />
   </ItemGroup>

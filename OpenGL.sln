@@ -10,6 +10,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		README.md = README.md
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MonkTest", "MonkTest\MonkTest.vcxproj", "{288FC4B3-9505-40ED-BEB0-A03F8EA4B736}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -26,6 +28,14 @@ Global
 		{03AE8131-3002-4151-BCD9-86481857C743}.Release|x64.Build.0 = Release|x64
 		{03AE8131-3002-4151-BCD9-86481857C743}.Release|x86.ActiveCfg = Release|Win32
 		{03AE8131-3002-4151-BCD9-86481857C743}.Release|x86.Build.0 = Release|Win32
+		{288FC4B3-9505-40ED-BEB0-A03F8EA4B736}.Debug|x64.ActiveCfg = Debug|x64
+		{288FC4B3-9505-40ED-BEB0-A03F8EA4B736}.Debug|x64.Build.0 = Debug|x64
+		{288FC4B3-9505-40ED-BEB0-A03F8EA4B736}.Debug|x86.ActiveCfg = Debug|Win32
+		{288FC4B3-9505-40ED-BEB0-A03F8EA4B736}.Debug|x86.Build.0 = Debug|Win32
+		{288FC4B3-9505-40ED-BEB0-A03F8EA4B736}.Release|x64.ActiveCfg = Release|x64
+		{288FC4B3-9505-40ED-BEB0-A03F8EA4B736}.Release|x64.Build.0 = Release|x64
+		{288FC4B3-9505-40ED-BEB0-A03F8EA4B736}.Release|x86.ActiveCfg = Release|Win32
+		{288FC4B3-9505-40ED-BEB0-A03F8EA4B736}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

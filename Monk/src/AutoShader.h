@@ -11,7 +11,7 @@ private:
 	TextWidget m_vertex_widget;
 	TextWidget m_fragment_widget;
 
-	bool m_success;
+	bool m_compile_status;
 	std::string m_reason;
 
 	std::unique_ptr<Shader> m_shader;
@@ -20,30 +20,26 @@ public:
 	AutoShader(const char* header) 
 		: m_vertex_widget{ TextWidget(header) }
 		, m_fragment_widget{ TextWidget(header) }
-		, m_success{ false }
+		, m_compile_status{ false }
 	{
 	}
+
+	AutoShader(const char* header, const char* vertex_src, const char* frag_src)
+		: m_vertex_widget{ TextWidget(header) }
+		, m_fragment_widget{ TextWidget(header) }
+		, m_compile_status{ false }
+	{
+		m_vertex_widget.update_text(vertex_src);
+		m_fragment_widget.update_text(frag_src);
+	}
+
+	virtual ~AutoShader() override {};
 
 	virtual void setup() override;
 
 	virtual void render() override;
 	
-	void try_compile()
-	{
-		
-		ShaderErrorCallback err_cb = { [=](char* result)
-		{
-			m_success = false;
-			m_reason = std::string{ result };
-		} };
+	void try_compile();
 
-		auto vertex_txt = m_vertex_widget.get_text();
-		auto frag_txt = m_fragment_widget.get_text();
-		
-		auto from_text = std::make_unique<Shader>((Shader::fromText(vertex_txt.c_str(), frag_txt.c_str(), err_cb)));
-		if (m_success)
-		{
-			std::cout << "woohoo!" << std::endl;
-		}
-	}
+	bool get_status() const;
 };

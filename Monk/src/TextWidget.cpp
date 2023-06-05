@@ -6,15 +6,20 @@ void TextWidget::setup()
 
 void TextWidget::render()
 {
-	ImGui::InputText(header.c_str(), &content);
+	ImGui::InputText(m_header.c_str(), &m_content);
+}
+
+void TextWidget::update_text(const char* content)
+{
+	m_content = std::string{ content };
 }
 
 const std::string& TextWidget::get_text() const
 {
-	return content;
+	return m_content;
 }
 
 const char* TextWidget::get_text_modifiable() const
 {
-	return content.c_str();
+	return m_content.c_str();
 }

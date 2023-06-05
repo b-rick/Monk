@@ -2,12 +2,26 @@
 
 #include <iostream>
 #include <iterator>
+#include <functional>
 #include <fstream>
 #include <sstream>
 #include <string>
 #include <glad/glad.h>
 
-typedef void (*ShaderErrorCallback) (char* info);
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+
+struct ShaderErrorCallback
+{
+	using Callback = std::function<void(char*)>;
+	ShaderErrorCallback(Callback fn) : fn_{ std::move(fn) } {}
+	Callback fn_;
+
+	void operator() (char * err)
+	{
+		fn_(err);
+	}
+};
 
 class Shader
 {
@@ -35,7 +49,7 @@ private:
 			std::cerr << "SHADER::FILE_NOT_READ\n" << e.what() << std::endl;
 		}
 
-		auto my_error_cb = [](char* infoLog) { std::cerr << "SHADER::COMPILATION_FAILED\n" << infoLog << std::endl; };
+		auto my_error_cb = ShaderErrorCallback{ [](char* infoLog) { std::cerr << "SHADER::COMPILATION_FAILED\n" << infoLog << std::endl; } };
 		return compileShaderSource(shaderSrc.c_str(), aShaderType, my_error_cb);
 	}
 
@@ -71,7 +85,6 @@ private:
 			char infoLog[512]{};
 			glGetProgramInfoLog(aId, 512, nullptr, infoLog);
 			error_callback(infoLog);
-		
 		}
 	}
 
@@ -83,7 +96,7 @@ public:
 		glAttachShader(m_Handle, fragment_shader);
 		glLinkProgram(m_Handle);
 		
-		auto err_cb = [](char* info) { 	std::cerr << "SHADER::LINK_FAILED\n" << info << std::endl; };
+		auto err_cb = ShaderErrorCallback{ [](char* info) { 	std::cerr << "SHADER::LINK_FAILED\n" << info << std::endl; } };
 		handleLinkError(m_Handle, GL_LINK_STATUS, err_cb);
 
 		glDetachShader(m_Handle, vertex_shader);
