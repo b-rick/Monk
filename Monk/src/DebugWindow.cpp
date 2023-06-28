@@ -78,7 +78,6 @@ void DebugWindow::render()
 	ImGui::End();
 }
 
-
 void DebugWindow::clear()
 {
 	m_buffer.clear();

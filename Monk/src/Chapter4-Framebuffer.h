@@ -1,6 +1,9 @@
 #pragma once
 
+#include "AutoShader.h"
+#include "AutoShaderMenu.h"
 #include "Box.h"
+#include "DebugWindow.h"
 #include "Framebuffer.h"
 #include "ColorAttachment.h"
 #include "RenderBuffer.h"
@@ -22,6 +25,8 @@ class Chapter4FB : public Window
 {
 private:
 	bool m_menu_open;
+    bool m_demo_open;
+
     float m_movement_speed;
 
     std::unique_ptr<VertexBuffer> m_box_buffer;
@@ -42,8 +47,16 @@ private:
     std::unique_ptr<ColorTextureAttachment> m_color_attachment;
     std::unique_ptr<RenderBuffer> m_depth_stencil_rb;
     
+    std::unique_ptr<DebugWindow> m_debug_window;
+    AutoShaderMenu m_auto_shader_menu;
+    
 public:
-	Chapter4FB() : Window(), m_menu_open{false}, m_movement_speed{2.0}
+	Chapter4FB() 
+        : Window()
+        , m_menu_open{false}
+        , m_movement_speed{2.0}
+        , m_debug_window{ std::make_unique<DebugWindow>("debug window") }
+        , m_auto_shader_menu{ m_debug_window.get()}
 	{
 	}
 
@@ -56,25 +69,11 @@ public:
 		auto& io = ImGui::GetIO(); IM_UNUSED(io);
 		auto vp = ImGui::GetMainViewport();
 
-		if (m_menu_open)
-		{
-            ImGui::Begin("Frame buffer", &m_menu_open);
-            if (ImGui::Button("Close app"))
-            {
-                m_should_close = true;
-            }
-            ImGui::End();
-		}
-        else
-        {
+        m_auto_shader_menu.render();
+        m_debug_window->render();
+
             m_camera->process_mouse_movement(io.MouseDelta.x, -1.0f * io.MouseDelta.y);
             m_camera->process_mouse_scroll(io.MouseWheel);
-        }
-
-        if (ImGui::IsKeyDown(ImGuiKey_Escape))
-        {
-            m_menu_open = true;
-        }
         if (ImGui::IsKeyDown(ImGuiKey_W))
         {
             m_camera->process_keypress(CameraMovement::FORWARD, io.DeltaTime * m_movement_speed);
@@ -100,6 +99,10 @@ public:
             m_camera->process_keypress(CameraMovement::UP, io.DeltaTime * m_movement_speed);
         }
 
+        m_debug_window->log_debug("%d width | %d height | %d remaining\n",
+            m_auto_shader_menu.width(),
+            m_auto_shader_menu.height(),
+            m_auto_shader_menu.remaining_width());
         ImGui::Render();
 	}
 
