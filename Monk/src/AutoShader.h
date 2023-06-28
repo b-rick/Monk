@@ -8,29 +8,36 @@
 class AutoShader : Widget
 {
 private:
-	TextWidget m_vertex_widget;
-	TextWidget m_fragment_widget;
+	std::unique_ptr<TextWidget> m_vertex_widget;
+	std::unique_ptr<TextWidget> m_fragment_widget;
+
+	std::unique_ptr<Shader> m_shader;
 
 	bool m_compile_status;
 	std::string m_reason;
 
-	std::unique_ptr<Shader> m_shader;
-
 public:
-	AutoShader(const char* header) 
-		: m_vertex_widget{ TextWidget(header) }
-		, m_fragment_widget{ TextWidget(header) }
+	AutoShader(std::unique_ptr<TextWidget> vertex_widget, std::unique_ptr<TextWidget> frag_widget)
+		: m_vertex_widget{ std::move(vertex_widget) }
+		, m_fragment_widget{ std::move(frag_widget) }
 		, m_compile_status{ false }
 	{
 	}
 
-	AutoShader(const char* header, const char* vertex_src, const char* frag_src)
-		: m_vertex_widget{ TextWidget(header) }
-		, m_fragment_widget{ TextWidget(header) }
+	AutoShader() 
+		: m_vertex_widget{ std::make_unique<TextWidget>("fragment")}
+		, m_fragment_widget{ std::make_unique<TextWidget>("vertex")}
 		, m_compile_status{ false }
 	{
-		m_vertex_widget.update_text(vertex_src);
-		m_fragment_widget.update_text(frag_src);
+	}
+
+	AutoShader(const char* vertex_src, const char* frag_src)
+		: m_vertex_widget{ std::make_unique<TextWidget>("fragment")}
+		, m_fragment_widget{ std::make_unique<TextWidget>("vertex")}
+		, m_compile_status{ false }
+	{
+		m_vertex_widget->update_text(vertex_src);
+		m_fragment_widget->update_text(frag_src);
 	}
 
 	virtual ~AutoShader() override {};

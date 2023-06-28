@@ -89,7 +89,7 @@ TEST(AutoShaderTest, ShaderInvalidOnStartup)
         ASSERT_FALSE(true);
     }
 
-    auto& auto_shader = AutoShader("header", vertex_shader_good, frag_shader_good);
+    auto& auto_shader = AutoShader(vertex_shader_good, frag_shader_good);
 
     EXPECT_FALSE(auto_shader.get_status());
 
@@ -104,7 +104,7 @@ TEST(AutoShaderTest, CanCompileValidShader)
         ASSERT_FALSE(true);
     }
 
-	auto& auto_shader = AutoShader("header", vertex_shader_good, frag_shader_good );
+	auto& auto_shader = AutoShader(vertex_shader_good, frag_shader_good );
 	auto_shader.try_compile();
 
 	EXPECT_TRUE(auto_shader.get_status());
@@ -120,10 +120,57 @@ TEST(AutoShaderTest, ContinuesOnInvalidShader)
         ASSERT_FALSE(true);
     }
 
-    auto& auto_shader = AutoShader("header", vertex_shader_bad, frag_shader_good);
+    auto& auto_shader = AutoShader(vertex_shader_bad, frag_shader_good);
     auto_shader.try_compile();
 
     EXPECT_FALSE(auto_shader.get_status());
+
+    close_test(window);
+}
+
+TEST(AutoShaderTest, CanMoveConstructAutoShader)
+{
+    auto window = init_test();
+    if (window == nullptr)
+    {
+        ASSERT_FALSE(true);
+    }
+
+    auto vert_widget = std::make_unique<TextWidget>(vertex_shader_bad);
+    auto frag_widget = std::make_unique<TextWidget>(frag_shader_good);
+
+    auto vert_ptr = vert_widget.get();
+    auto frag_ptr = frag_widget.get();
+
+    auto& auto_shader = AutoShader{ std::move(vert_widget), std::move(frag_widget) };
+    EXPECT_FALSE(auto_shader.get_status());
+
+    close_test(window);
+}
+
+TEST(AutoShaderTest, CanCompileAfterFailure)
+{
+    auto window = init_test();
+    if (window == nullptr)
+    {
+        ASSERT_FALSE(true);
+    }
+
+    auto vert_widget = std::make_unique<TextWidget>(vertex_shader_bad);
+    auto frag_widget = std::make_unique<TextWidget>(frag_shader_good);
+
+    auto vert_ptr = vert_widget.get();
+    auto frag_ptr = frag_widget.get();
+
+    auto& auto_shader = AutoShader{ std::move(vert_widget), std::move(frag_widget) };
+    EXPECT_FALSE(auto_shader.get_status());
+
+    auto_shader.try_compile();
+    EXPECT_FALSE(auto_shader.get_status());
+
+    vert_ptr->update_text(vertex_shader_good);
+    auto_shader.try_compile();
+    EXPECT_TRUE(auto_shader.get_status());
 
     close_test(window);
 }

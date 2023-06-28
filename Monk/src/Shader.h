@@ -35,9 +35,9 @@ private:
 		return sstr.str();
 	}
 
-	static unsigned int compileShader(const char* aShaderPath, GLenum aShaderType)
+	static std::string read_src(const char* path)
 	{
-		auto shaderStream = std::ifstream{ aShaderPath };
+		auto shaderStream = std::ifstream{ path };
 		shaderStream.exceptions(std::ifstream::failbit | std::ifstream::badbit);
 		auto shaderSrc = std::string{};
 		try
@@ -48,9 +48,7 @@ private:
 		{
 			std::cerr << "SHADER::FILE_NOT_READ\n" << e.what() << std::endl;
 		}
-
-		auto my_error_cb = ShaderErrorCallback{ [](char* infoLog) { std::cerr << "SHADER::COMPILATION_FAILED\n" << infoLog << std::endl; } };
-		return compileShaderSource(shaderSrc.c_str(), aShaderType, my_error_cb);
+		return shaderSrc;
 	}
 
 	static unsigned int compileShaderSource(const char* shader_src, GLenum aShaderType, ShaderErrorCallback error_callback)
@@ -88,15 +86,13 @@ private:
 		}
 	}
 
-public:
-	explicit Shader(int vertex_shader, int fragment_shader)
+	void init(int vertex_shader, int fragment_shader, ShaderErrorCallback err_cb)
 	{
 		m_Handle = glCreateProgram();
 		glAttachShader(m_Handle, vertex_shader);
 		glAttachShader(m_Handle, fragment_shader);
 		glLinkProgram(m_Handle);
-		
-		auto err_cb = ShaderErrorCallback{ [](char* info) { 	std::cerr << "SHADER::LINK_FAILED\n" << info << std::endl; } };
+
 		handleLinkError(m_Handle, GL_LINK_STATUS, err_cb);
 
 		glDetachShader(m_Handle, vertex_shader);
@@ -106,17 +102,30 @@ public:
 		glDeleteShader(fragment_shader);
 	}
 
-	Shader(const char* vertexPath, const char* fragmentPath) 
-		: Shader(compileShader(vertexPath, GL_VERTEX_SHADER), 
-			compileShader(fragmentPath, GL_FRAGMENT_SHADER))
+public:
+	explicit Shader(int vertex_shader, int fragment_shader, ShaderErrorCallback err_cb)
 	{
+		init(vertex_shader, fragment_shader, err_cb);
+	}
+
+	Shader(const char* vertexPath, const char* fragmentPath) 
+	{
+		auto my_error_cb = ShaderErrorCallback{ [](char* infoLog) { std::cerr << "SHADER::COMPILATION_FAILED\n" << infoLog << std::endl; } };
+
+		auto vert_src = read_src(vertexPath);
+		auto frag_src = read_src(fragmentPath);
+		
+		auto vert_shader = compileShaderSource(vert_src.c_str(), GL_VERTEX_SHADER, my_error_cb);
+		auto frag_shader = compileShaderSource(frag_src.c_str(), GL_FRAGMENT_SHADER, my_error_cb);
+
+		init(vert_shader, frag_shader, my_error_cb);
 	}
 
 	static Shader fromText(const char* vertex_src, const char* frag_src, ShaderErrorCallback err_callback)
 	{
 		auto vertex_shader = compileShaderSource(vertex_src, GL_VERTEX_SHADER, err_callback);
 		auto fragment_shader = compileShaderSource(frag_src, GL_FRAGMENT_SHADER, err_callback);
-		return Shader(vertex_shader, fragment_shader);
+		return Shader(vertex_shader, fragment_shader, err_callback);
 	}
 
 	void use() const
