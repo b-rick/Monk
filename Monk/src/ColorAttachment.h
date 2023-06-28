@@ -41,4 +41,13 @@ public:
 	{
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
+
+	// Because the opengl treats everything like a state machine, we can resize this without creating a new color atachment object every time.
+	// However - this should probably be the responsibility of the framebuffer that owns this object. 
+	void resize(int width, int height)
+	{
+		bind();
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
+		unbind();
+	}
 };

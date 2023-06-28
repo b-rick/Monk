@@ -43,4 +43,13 @@ public:
 	{
 		glBindRenderbuffer(GL_RENDERBUFFER, 0);
 	}
+	
+	// Because the opengl treats everything like a state machine, we can resize this without creating a new render buffer object every time.
+	// However - this should probably be the responsibility of the framebuffer that owns this object. 
+	void resize(int width, int height)
+	{
+		bind();
+		glRenderbufferStorage(GL_RENDERBUFFER, m_type, width, height);
+		unbind();
+	}
 };

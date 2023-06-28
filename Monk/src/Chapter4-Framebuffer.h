@@ -154,6 +154,20 @@ public:
         m_framebuffer->unbind();
     }
 
+    void on_resize(int width, int height)
+    {
+        Window::on_resize(width, height);
+        m_color_attachment->resize(width, height);
+        m_depth_stencil_rb->resize(width, height);
+
+        auto status = FrameBuffer::check_status();
+        if (status != GL_FRAMEBUFFER_COMPLETE)
+        {
+            std::cerr << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
+        }
+        m_framebuffer->unbind();
+    }
+
 	void on_render_frame()
 	{
         m_framebuffer->bind();
