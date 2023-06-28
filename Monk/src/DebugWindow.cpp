@@ -1,8 +1,22 @@
 #include "DebugWindow.h"
 
+void DebugWindow::open(bool open)
+{
+	m_open = open;
+}
+
+const char* DebugWindow::calc_line_end(const char* buf, int line_no, const std::vector<int>& line_offsets)
+{
+	return (line_no + 1 < line_offsets.size()) ? (buf + line_offsets[line_no + 1] - 1) : buf;
+}
+
 void DebugWindow::render()
 {
-	if (!ImGui::Begin(m_title, &m_window_open))
+	if (!m_open)
+	{
+		return;
+	}
+	if (!ImGui::Begin(m_title, &m_open))
 	{
 		ImGui::End();
 		return;
@@ -32,7 +46,7 @@ void DebugWindow::render()
 			for (int line_no = 0; line_no < m_line_offsets.size(); line_no++)
 			{
 				const char* line_start = buf + m_line_offsets[line_no];
-				const char* line_end = (line_no + 1 < m_line_offsets.size()) ? (buf + m_line_offsets[line_no + 1] - 1) : buf_end;
+				const char* line_end = calc_line_end(buf, line_no, m_line_offsets);
 				if (m_filter.PassFilter(line_start, line_end))
 				{
 					ImGui::TextUnformatted(line_start, line_end);
@@ -48,7 +62,7 @@ void DebugWindow::render()
 				for (int line_no = clipper.DisplayStart; line_no < clipper.DisplayEnd; line_no++)
 				{
 					const char* line_start = buf + m_line_offsets[line_no];
-					const char* line_end = (line_no + 1 < m_line_offsets.size()) ? (buf + m_line_offsets[line_no + 1] - 1) : buf_end;
+					const char* line_end = calc_line_end(buf, line_no, m_line_offsets);
 					ImGui::TextUnformatted(line_start, line_end);
 				}
 			}
@@ -63,6 +77,7 @@ void DebugWindow::render()
 	ImGui::EndChild();
 	ImGui::End();
 }
+
 
 void DebugWindow::clear()
 {
