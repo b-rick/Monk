@@ -25,7 +25,6 @@ class Chapter4FB : public Window
 {
 private:
 	bool m_menu_open;
-    bool m_demo_open;
 
     float m_movement_speed;
 
@@ -49,6 +48,7 @@ private:
     
     std::unique_ptr<DebugWindow> m_debug_window;
     AutoShaderMenu m_auto_shader_menu;
+    AutoShader m_auto_shader;
     
 public:
 	Chapter4FB() 
@@ -137,6 +137,12 @@ public:
 
         m_draw_shader = std::make_unique<Shader>("shader/fb/normal.vert", "shader/fb/normal.frag");
         m_frame_shader = std::make_unique<Shader>("shader/fb/frame.vert", "shader/fb/frame.frag");
+
+        auto vertex_src = IOUtils::read_src("shader/fb/frame.vert");
+        auto fragment_src = IOUtils::read_src("shader/fb/frame.frag");
+        m_auto_shader.update_vertex_src(vertex_src.c_str());
+        m_auto_shader.update_fragment_src(fragment_src.c_str());
+        m_auto_shader.try_compile();
 
         m_box_texture = std::make_unique<Texture>("img/container.jpg", DIFFUSE);
         m_floor_texture = std::make_unique<Texture>("img/depth/metal.png", DIFFUSE);

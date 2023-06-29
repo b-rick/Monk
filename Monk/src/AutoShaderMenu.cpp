@@ -49,3 +49,14 @@ const uint32_t AutoShaderMenu::remaining_width() const
 	auto vp = ImGui::GetMainViewport();
 	return static_cast<uint32_t>(vp->WorkSize.x) - width();
 }
+
+const AutoShader& AutoShaderMenu::get_auto_shader() const
+{
+	return m_auto_shader;
+}
+
+void AutoShaderMenu::update_shader_src(const char* vertex_src, const char* fragment_src)
+{
+	m_auto_shader.update_vertex_src(vertex_src);
+	m_auto_shader.update_fragment_src(fragment_src);
+}

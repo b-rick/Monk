@@ -1,3 +1,4 @@
+#include <algorithm>
 #include "AutoShader.h"
 
 void AutoShader::try_compile()
@@ -9,7 +10,7 @@ void AutoShader::try_compile()
 	}};
 
 	m_compile_status = true;
-	m_shader = std::make_unique<Shader>((Shader::fromText(m_vertex_src.c_str(), m_fragment_src.c_str(), err_cb)));
+	m_shader = std::move(Shader::fromText(m_vertex_src.c_str(), m_fragment_src.c_str(), err_cb));
 	if (!m_compile_status)
 	{
 		std::cerr << "Failed to create shader." <<  m_reason << std::endl;
@@ -29,4 +30,9 @@ void AutoShader::update_vertex_src(const char* vertex_src)
 void AutoShader::update_fragment_src(const char* fragment_src)
 {
 	m_fragment_src = std::string{ fragment_src };
+}
+
+void AutoShader::use() const
+{
+	m_shader.use();
 }

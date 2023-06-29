@@ -11,7 +11,7 @@ private:
 	std::string m_vertex_src;
 	std::string m_fragment_src;
 
-	std::unique_ptr<Shader> m_shader;
+	Shader m_shader;
 
 	bool m_compile_status;
 	std::string m_reason;
@@ -38,4 +38,6 @@ public:
 	void update_fragment_src(const char* fragment_src);
 
 	bool get_status() const;
+
+	void use() const;
 };

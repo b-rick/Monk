@@ -171,6 +171,7 @@ XCOPY "$(SolutionDir)Monk\img" "$(TargetDir)img\" /S /Y</Command>
     <ClInclude Include="src\Chapter4Depth.h" />
     <ClInclude Include="src\Framebuffer.h" />
     <ClInclude Include="src\ImGuiDemo.h" />
+    <ClInclude Include="src\io\IOUtils.h" />
     <ClInclude Include="src\Light.h" />
     <ClInclude Include="src\LightingWindow.h" />
     <ClInclude Include="src\Locations.h" />

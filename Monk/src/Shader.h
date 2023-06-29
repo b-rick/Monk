@@ -1,15 +1,14 @@
 #pragma once
 
-#include <iostream>
-#include <iterator>
+
+#include "io/IOUtils.h"
 #include <functional>
-#include <fstream>
-#include <sstream>
-#include <string>
 #include <glad/glad.h>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+
+#define NOT_READY UINT32_MAX
 
 struct ShaderErrorCallback
 {
@@ -27,29 +26,6 @@ class Shader
 {
 private:
 	unsigned int m_Handle;
-
-	static std::string slurp(std::ifstream& aIn)
-	{
-		auto sstr = std::ostringstream{};
-		sstr << aIn.rdbuf();
-		return sstr.str();
-	}
-
-	static std::string read_src(const char* path)
-	{
-		auto shaderStream = std::ifstream{ path };
-		shaderStream.exceptions(std::ifstream::failbit | std::ifstream::badbit);
-		auto shaderSrc = std::string{};
-		try
-		{
-			shaderSrc = slurp(shaderStream);
-		}
-		catch (std::ifstream::failure const& e)
-		{
-			std::cerr << "SHADER::FILE_NOT_READ\n" << e.what() << std::endl;
-		}
-		return shaderSrc;
-	}
 
 	static unsigned int compileShaderSource(const char* shader_src, GLenum aShaderType, ShaderErrorCallback error_callback)
 	{
@@ -108,17 +84,28 @@ public:
 		init(vertex_shader, fragment_shader, err_cb);
 	}
 
+	Shader() : m_Handle{ NOT_READY }
+	{
+	}
+
 	Shader(const char* vertexPath, const char* fragmentPath) 
 	{
 		auto my_error_cb = ShaderErrorCallback{ [](char* infoLog) { std::cerr << "SHADER::COMPILATION_FAILED\n" << infoLog << std::endl; } };
 
-		auto vert_src = read_src(vertexPath);
-		auto frag_src = read_src(fragmentPath);
+		auto vert_src = IOUtils::read_src(vertexPath);
+		auto frag_src = IOUtils::read_src(fragmentPath);
 		
 		auto vert_shader = compileShaderSource(vert_src.c_str(), GL_VERTEX_SHADER, my_error_cb);
 		auto frag_shader = compileShaderSource(frag_src.c_str(), GL_FRAGMENT_SHADER, my_error_cb);
 
 		init(vert_shader, frag_shader, my_error_cb);
+	}
+
+	Shader& operator=(Shader&& shader) noexcept
+	{
+		m_Handle = shader.m_Handle;
+		shader.m_Handle = NOT_READY;
+		return *this;
 	}
 
 	static Shader fromText(const char* vertex_src, const char* frag_src, ShaderErrorCallback err_callback)
@@ -130,7 +117,15 @@ public:
 
 	void use() const
 	{
-		glUseProgram(m_Handle);
+		if (m_Handle == NOT_READY)
+		{
+			// TODO: Move this to our debug logger after it's been made static. Maybe even a logger factory? 
+			std::cerr << "Do not try to use the default shader!" << std::endl;
+		}
+		else 
+		{
+			glUseProgram(m_Handle);
+		}
 	}
 
 	inline void set_uniformi(const char* attribName, unsigned int value) const
@@ -165,11 +160,23 @@ public:
 
 	inline int get_uniform_location(const char* attribName) const
 	{
-		return glGetUniformLocation(m_Handle, attribName);
+		if (m_Handle == NOT_READY)
+		{
+			return -1;
+		} 
+		else
+		{
+			return glGetUniformLocation(m_Handle, attribName);
+		}
 	}
 
 	~Shader()
 	{
-		glDeleteProgram(m_Handle);
+		if (m_Handle != NOT_READY)
+		{
+			glDeleteProgram(m_Handle);
+			// TODO: Move this to our debug logger after it's been made static. Maybe even a logger factory? 
+			std::cerr << "Deleting the shader" << std::endl;
+		}
 	}
 };
