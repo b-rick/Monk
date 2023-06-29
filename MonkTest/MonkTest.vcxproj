@@ -33,16 +33,17 @@
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros" />
   <ItemGroup>
-    <ClInclude Include="pch.h" />
+    <ClInclude Include="test\pch.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="AutoShaderTest.cpp" />
-    <ClCompile Include="pch.cpp">
+    <ClCompile Include="test\AutoShaderTest.cpp" />
+    <ClCompile Include="test\pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="test\TextWidgetTest.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Monk\Project1.vcxproj">

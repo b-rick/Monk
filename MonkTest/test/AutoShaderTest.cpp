@@ -4,8 +4,6 @@
 #include <GLFW/glfw3.h>
 
 #include "AutoShader.h"
-#include "Widget.h"
-#include "TextWidget.h"
 
 const char* vertex_shader_good = 
 R""""(
