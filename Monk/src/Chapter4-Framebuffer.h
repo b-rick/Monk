@@ -72,32 +72,32 @@ public:
         m_auto_shader_menu.render();
         m_debug_window->render();
 
-            m_camera->process_mouse_movement(io.MouseDelta.x, -1.0f * io.MouseDelta.y);
-            m_camera->process_mouse_scroll(io.MouseWheel);
-        if (ImGui::IsKeyDown(ImGuiKey_W))
-        {
-            m_camera->process_keypress(CameraMovement::FORWARD, io.DeltaTime * m_movement_speed);
-        }
-        if (ImGui::IsKeyDown(ImGuiKey_S))
-        {
-            m_camera->process_keypress(CameraMovement::BACKWARD, io.DeltaTime * m_movement_speed);
-        }
-        if (ImGui::IsKeyDown(ImGuiKey_A))
-        {
-            m_camera->process_keypress(CameraMovement::LEFT, io.DeltaTime * m_movement_speed);
-        }
-        if (ImGui::IsKeyDown(ImGuiKey_D))
-        {
-            m_camera->process_keypress(CameraMovement::RIGHT, io.DeltaTime * m_movement_speed);
-        }
-        if (ImGui::IsKeyDown(ImGuiKey_LeftShift))
-        {
-            m_camera->process_keypress(CameraMovement::DOWN, io.DeltaTime * m_movement_speed);
-        }
-        if (ImGui::IsKeyDown(ImGuiKey_Space))
-        {
-            m_camera->process_keypress(CameraMovement::UP, io.DeltaTime * m_movement_speed);
-        }
+		m_camera->process_mouse_movement(io.MouseDelta.x, -1.0f * io.MouseDelta.y);
+		m_camera->process_mouse_scroll(io.MouseWheel);
+		if (ImGui::IsKeyDown(ImGuiKey_W))
+		{
+			m_camera->process_keypress(CameraMovement::FORWARD, io.DeltaTime * m_movement_speed);
+		}
+		if (ImGui::IsKeyDown(ImGuiKey_S))
+		{
+			m_camera->process_keypress(CameraMovement::BACKWARD, io.DeltaTime * m_movement_speed);
+		}
+		if (ImGui::IsKeyDown(ImGuiKey_A))
+		{
+			m_camera->process_keypress(CameraMovement::LEFT, io.DeltaTime * m_movement_speed);
+		}
+		if (ImGui::IsKeyDown(ImGuiKey_D))
+		{
+			m_camera->process_keypress(CameraMovement::RIGHT, io.DeltaTime * m_movement_speed);
+		}
+		if (ImGui::IsKeyDown(ImGuiKey_LeftShift))
+		{
+			m_camera->process_keypress(CameraMovement::DOWN, io.DeltaTime * m_movement_speed);
+		}
+		if (ImGui::IsKeyDown(ImGuiKey_Space))
+		{
+			m_camera->process_keypress(CameraMovement::UP, io.DeltaTime * m_movement_speed);
+		}
 
         m_debug_window->log_debug("%d width | %d height | %d remaining\n",
             m_auto_shader_menu.width(),
@@ -177,6 +177,8 @@ public:
         glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glEnable(GL_DEPTH_TEST);
+        glEnable(GL_SCISSOR_TEST);
+        glScissor(m_auto_shader_menu.width(), 0, m_auto_shader_menu.remaining_width(), m_auto_shader_menu.height());
 
         auto view = m_camera->view_matrix();
         auto project = m_camera->projection_matrix();
@@ -203,6 +205,7 @@ public:
             m_draw_shader->set_uniform_mat4("model", cube_model);
             glDrawArrays(GL_TRIANGLES, 0, 36);
         }
+        glDisable(GL_SCISSOR_TEST);
 
         /** Bind back to the default framebuffer and draw! */
         FrameBuffer::bind_default();
