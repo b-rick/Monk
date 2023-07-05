@@ -177,6 +177,8 @@ XCOPY "$(SolutionDir)Monk\img" "$(TargetDir)img\" /S /Y</Command>
     <ClInclude Include="src\Locations.h" />
     <ClInclude Include="src\Mesh.h" />
     <ClInclude Include="src\Model.h" />
+    <ClCompile Include="src\PauseMenu.cpp" />
+    <ClCompile Include="src\PauseMenu.h" />
     <ClCompile Include="src\sbti.cpp" />
     <ClCompile Include="src\TextWidget.cpp" />
     <ClCompile Include="src\VertexArray.cpp" />
