@@ -6,6 +6,7 @@
 #include "DebugWindow.h"
 #include "Framebuffer.h"
 #include "ColorAttachment.h"
+#include "PauseMenu.h"
 #include "RenderBuffer.h"
 #include "Locations.h"
 #include "Shader.h"
@@ -49,6 +50,7 @@ private:
     std::unique_ptr<DebugWindow> m_debug_window;
     AutoShaderMenu m_auto_shader_menu;
     AutoShader m_auto_shader;
+    PauseMenu m_pause_menu;
     
 public:
 	Chapter4FB() 
@@ -57,6 +59,7 @@ public:
         , m_movement_speed{2.0}
         , m_debug_window{ std::make_unique<DebugWindow>("debug window") }
         , m_auto_shader_menu{ m_debug_window.get()}
+        , m_pause_menu{ m_debug_window.get() }
 	{
 	}
 
@@ -70,39 +73,46 @@ public:
 		auto vp = ImGui::GetMainViewport();
 
         m_auto_shader_menu.render();
+
+        auto pause_x = m_auto_shader_menu.width() + m_auto_shader_menu.remaining_width() / 2;
+        auto pause_y = m_auto_shader_menu.height() / 2;
+        m_pause_menu.render(pause_x, pause_y);
         m_debug_window->render();
+        
+        if (!m_pause_menu.is_paused())
+        {
+			m_camera->process_mouse_movement(io.MouseDelta.x, -1.0f * io.MouseDelta.y);
+			m_camera->process_mouse_scroll(io.MouseWheel);
 
-		m_camera->process_mouse_movement(io.MouseDelta.x, -1.0f * io.MouseDelta.y);
-		m_camera->process_mouse_scroll(io.MouseWheel);
-		if (ImGui::IsKeyDown(ImGuiKey_W))
-		{
-			m_camera->process_keypress(CameraMovement::FORWARD, io.DeltaTime * m_movement_speed);
-		}
-		if (ImGui::IsKeyDown(ImGuiKey_S))
-		{
-			m_camera->process_keypress(CameraMovement::BACKWARD, io.DeltaTime * m_movement_speed);
-		}
-		if (ImGui::IsKeyDown(ImGuiKey_A))
-		{
-			m_camera->process_keypress(CameraMovement::LEFT, io.DeltaTime * m_movement_speed);
-		}
-		if (ImGui::IsKeyDown(ImGuiKey_D))
-		{
-			m_camera->process_keypress(CameraMovement::RIGHT, io.DeltaTime * m_movement_speed);
-		}
-		if (ImGui::IsKeyDown(ImGuiKey_LeftShift))
-		{
-			m_camera->process_keypress(CameraMovement::DOWN, io.DeltaTime * m_movement_speed);
-		}
-		if (ImGui::IsKeyDown(ImGuiKey_Space))
-		{
-			m_camera->process_keypress(CameraMovement::UP, io.DeltaTime * m_movement_speed);
-		}
+			if (ImGui::IsKeyDown(ImGuiKey_Escape))
+			{
 
-        m_debug_window->log_debug("%d width | %d height | %d remaining\n",
-            m_auto_shader_menu.width(),
-            m_auto_shader_menu.height(),
-            m_auto_shader_menu.remaining_width());
+			}
+			if (ImGui::IsKeyDown(ImGuiKey_W))
+			{
+				m_camera->process_keypress(CameraMovement::FORWARD, io.DeltaTime * m_movement_speed);
+			}
+			if (ImGui::IsKeyDown(ImGuiKey_S))
+			{
+				m_camera->process_keypress(CameraMovement::BACKWARD, io.DeltaTime * m_movement_speed);
+			}
+			if (ImGui::IsKeyDown(ImGuiKey_A))
+			{
+				m_camera->process_keypress(CameraMovement::LEFT, io.DeltaTime * m_movement_speed);
+			}
+			if (ImGui::IsKeyDown(ImGuiKey_D))
+			{
+				m_camera->process_keypress(CameraMovement::RIGHT, io.DeltaTime * m_movement_speed);
+			}
+			if (ImGui::IsKeyDown(ImGuiKey_LeftShift))
+			{
+				m_camera->process_keypress(CameraMovement::DOWN, io.DeltaTime * m_movement_speed);
+			}
+			if (ImGui::IsKeyDown(ImGuiKey_Space))
+			{
+				m_camera->process_keypress(CameraMovement::UP, io.DeltaTime * m_movement_speed);
+			}
+        }
         ImGui::Render();
 	}
 
